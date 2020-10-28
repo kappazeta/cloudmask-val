@@ -39,28 +39,26 @@ true_undefined=((m==3) & (p==3))
 predictedcloud_instead_clear = ((p==255) & (m==66))
 predictedcloud_instead_cloudshadow=((p==255) & (m==129))
 predictedcloud_instead_semitransparent=((p==255) & (m==192))
-#predictedcloud_instead_undefined=((p==255) & (m==3))
+
 
 predictedclear_instead_cloud = ((p==66) & (m==255))
 predictedclear_instead_cloudshadow = ((p==66) & (m==129))
 predictedclear_instead_semitransparent = ((p==66) & (m==192))
-#predictedclear_instead_undefined = ((p==66) & (m==3))
+
 
 predictedshadow_instead_cloud = ((p==129) & (m==255))
 predictedshadow_instead_clear = ((p==129) & (m==66))
 predictedshadow_instead_semitransparent = ((p==129) & (m==192))
-#predictedshadow_instead_undefined = ((p==129) & (m==3))
+
 
 predictedsemitransparent_instead_cloud = ((p==192) & (m==255))
 predictedsemitransparent_instead_clear = ((p==192) & (m==66))
 predictedsemitransparent_instead_cloudshadow = ((p==192) & (m==129))
-#predictedsemitransparent_instead_undefined = ((p==192) & (m==3))
+
 
 predicted_instead_undefined=((p!=3) & (m==3))
 predictedundefined_instead_ = ((p==3) & (m!=3))
-#predictedundefined_instead_clear = ((p==3) & (m==66))
-#predictedundefined_instead_semitransparent = ((p==3) & (m==192))
-#predictedundefined_instead_cloudshadow = ((p==3) & (m==129))
+
 
 #We don't need to show all the labels every time; only these that are actually included
 #So create a list of existing labels
