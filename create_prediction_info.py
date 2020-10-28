@@ -9,98 +9,65 @@ from matplotlib.gridspec import GridSpec
 from matplotlib import cm
 
 input_folder=sys.argv[1]
+tiles_with_undefined=sys.argv[2]
 
-cloud_predict=input_folder+'/predict_CLOUD.png'
-cloud_mask=input_folder+'/CLOUD.png'
+predict=input_folder+'/prediction.png'
+mask=input_folder+'/label.png'
 
-cloudshadow_predict=input_folder+'/predict_CLOUD_SHADOW.png'
-cloudshadow_mask=input_folder+'/CLOUD_SHADOW.png'
-
-clear_predict=input_folder+'/predict_CLEAR.png'
-clear_mask=input_folder+'/CLEAR.png'
-
-semitransparent_predict=input_folder+'/predict_SEMI_TRANSPARENT_CLOUD.png'
-semitransparent_mask=input_folder+'/SEMI_TRANSPARENT_CLOUD.png'
-
-undefined_predict=input_folder+'/predict_UNDEFINED.png'
-undefined_mask=input_folder+'/UNDEFINED.png'
-            
-#Read in the mask files and make them numpy arrays
-
-with Image.open(cloud_mask) as im:
-    cloudm = np.array(im, dtype=np.float)
-    
-with Image.open(cloudshadow_mask) as im:
-    cloudshadowm = np.array(im, dtype=np.float)
-    
-with Image.open(clear_mask) as im:
-    clearm = np.array(im, dtype=np.float)
-    
-with Image.open(semitransparent_mask) as im:
-    semitransparentm = np.array(im, dtype=np.float)
-    
-with Image.open(undefined_mask) as im:
-    undefinedm = np.array(im, dtype=np.float)
-    
-#Read in predict files    
-
-with Image.open(cloud_predict) as im:
+with Image.open(mask) as im:
+    m = np.array(im, dtype=np.float)
     pix = np.array(im, dtype=np.float)
-    cloudp = np.array(im, dtype=np.float)
     
-with Image.open(cloudshadow_predict) as im:
-    cloudshadowp = np.array(im, dtype=np.float)
+with Image.open(predict) as im:
+    p = np.array(im, dtype=np.float)
     
-with Image.open(clear_predict) as im:
-    clearp = np.array(im, dtype=np.float)
+#Pixel values:
+#3 - undefined
+#66 - clear
+#129 - cloud shadow
+#192 - semitransparent
+#255 - cloud
+
+#Create masks:
     
-with Image.open(semitransparent_predict) as im:
-    semitransparentp = np.array(im, dtype=np.float)
-    
-with Image.open(undefined_predict) as im:
-    undefinedp = np.array(im, dtype=np.float)
-    
-#Both undefined label and undefined prediction are problematic
+true_cloud=((m==255) & (p==255))
+true_clear=((m==66) & (p==66))
+true_cloudshadow=((m==129) & (p==129))
+true_semitransparent=((m==192) & (p==192))
+true_undefined=((m==3) & (p==3))
 
-problem=(undefinedm==255)
-problem2=((undefinedp>clearp) & (undefinedp>cloudshadowp) & (undefinedp>semitransparentp) & (undefinedp>cloudp))
-   
-#Create masks which show all possible true and false predictions (and if false, then what was true)
+predictedcloud_instead_clear = ((p==255) & (m==66))
+predictedcloud_instead_cloudshadow=((p==255) & (m==129))
+predictedcloud_instead_semitransparent=((p==255) & (m==192))
+#predictedcloud_instead_undefined=((p==255) & (m==3))
 
-true_cloud=((cloudp>clearp) & (cloudp>cloudshadowp) & (cloudp>semitransparentp) & (cloudm==255))
+predictedclear_instead_cloud = ((p==66) & (m==255))
+predictedclear_instead_cloudshadow = ((p==66) & (m==129))
+predictedclear_instead_semitransparent = ((p==66) & (m==192))
+#predictedclear_instead_undefined = ((p==66) & (m==3))
 
-true_clear=((clearp>cloudp) & (clearp>cloudshadowp) & (clearp>semitransparentp) & (clearm==255))
+predictedshadow_instead_cloud = ((p==129) & (m==255))
+predictedshadow_instead_clear = ((p==129) & (m==66))
+predictedshadow_instead_semitransparent = ((p==129) & (m==192))
+#predictedshadow_instead_undefined = ((p==129) & (m==3))
 
-true_cloudshadow=((cloudshadowp>cloudp) & (cloudshadowp>clearp) & (cloudshadowp>semitransparentp) & (cloudshadowm==255))
+predictedsemitransparent_instead_cloud = ((p==192) & (m==255))
+predictedsemitransparent_instead_clear = ((p==192) & (m==66))
+predictedsemitransparent_instead_cloudshadow = ((p==192) & (m==129))
+#predictedsemitransparent_instead_undefined = ((p==192) & (m==3))
 
-true_semitransparent=((semitransparentp>cloudp) & (semitransparentp>clearp) & (semitransparentp>cloudshadowp) & (semitransparentm==255))
-
-true_undefined=((semitransparentp>cloudp) & (semitransparentp>clearp) & (semitransparentp>cloudshadowp) & (semitransparentm==255))
-
-predictedcloud_instead_clear = ((cloudp>clearp) & (cloudp>cloudshadowp) & (cloudp>semitransparentp) & (clearm==255))
-predictedcloud_instead_cloudshadow=((cloudp>clearp) & (cloudp>cloudshadowp) & (cloudp>semitransparentp) & (cloudshadowm==255))
-predictedcloud_instead_semitransparent=((cloudp>clearp) & (cloudp>cloudshadowp) & (cloudp>semitransparentp) & (semitransparentm==255))
-
-predictedclear_instead_cloud = ((clearp>cloudp) & (clearp>cloudshadowp) & (clearp>semitransparentp) & (cloudm==255))
-predictedclear_instead_cloudshadow = ((clearp>cloudp) & (clearp>cloudshadowp) & (clearp>semitransparentp) & (cloudshadowm==255))
-predictedclear_instead_semitransparent = ((clearp>cloudp) & (clearp>cloudshadowp) & (clearp>semitransparentp) & (semitransparentm==255))
-
-predictedshadow_instead_cloud = ((cloudshadowp>cloudp) & (cloudshadowp>clearp) & (cloudshadowp>semitransparentp) & (cloudm==255))
-predictedshadow_instead_clear = ((cloudshadowp>cloudp) & (cloudshadowp>clearp) & (cloudshadowp>semitransparentp) & (clearm==255))
-predictedshadow_instead_semitransparent = ((cloudshadowp>cloudp) & (cloudshadowp>clearp) & (cloudshadowp>semitransparentp) & (semitransparentm==255))
-
-predictedsemitransparent_instead_cloud = ((semitransparentp>cloudp) & (semitransparentp>clearp) & (semitransparentp>cloudshadowp) & (cloudm==255))
-predictedsemitransparent_instead_clear = ((semitransparentp>cloudp) & (semitransparentp>clearp) & (semitransparentp>cloudshadowp) & (clearm==255))
-
-predictedsemitransparent_instead_cloudshadow = ((semitransparentp>cloudp) & (semitransparentp>clearp) & (semitransparentp>cloudshadowp) & (cloudshadowm==255))
-
+predicted_instead_undefined=((p!=3) & (m==3))
+predictedundefined_instead_ = ((p==3) & (m!=3))
+#predictedundefined_instead_clear = ((p==3) & (m==66))
+#predictedundefined_instead_semitransparent = ((p==3) & (m==192))
+#predictedundefined_instead_cloudshadow = ((p==3) & (m==129))
 
 #We don't need to show all the labels every time; only these that are actually included
 #So create a list of existing labels
 
 existing_labels=[]
 
-#Return False if all elements are True
+#Return False if all elements are False
 
 def check(mask): 
     result = False;
@@ -140,10 +107,13 @@ if(check(predictedsemitransparent_instead_clear)==False):
     existing_labels.append(15)
 if(check(predictedsemitransparent_instead_cloudshadow)==False):
     existing_labels.append(16)
-if(check(problem)==False):
+if(check(true_undefined)==False):
     existing_labels.append(17)
-if(check(problem2)==False):
+if(check(predictedundefined_instead_)==False):
     existing_labels.append(18)
+if(check(predicted_instead_undefined)==False):
+    existing_labels.append(19)
+
 
 #Now actually assing labels (1-16) to masks and map them to some color
 
@@ -169,8 +139,9 @@ pix=np.where(predictedsemitransparent_instead_clear==False, pix, 15)
 
 pix=np.where(predictedsemitransparent_instead_cloudshadow==False, pix, 16)
 
-pix=np.where(problem==False, pix, 17)
-pix=np.where(problem2==False, pix, 18)
+pix=np.where(true_undefined==False, pix, 17)
+pix=np.where(predictedundefined_instead_==False, pix, 18)
+pix=np.where(predicted_instead_undefined==False, pix, 19)
 
 label_to_color = {
     1: [255, 255,255], # True cloud: white
@@ -186,16 +157,17 @@ label_to_color = {
     9: [240,230,140], #Clear instead of cloudshadow: khaki
     10: [60,179,113], #Clear instead of semitransparent: mediumseagreen
     
-    11: [65,105,225], #Shadow instead of cloud: royal blue
+    11: [255, 201, 0], #Shadow instead of cloud: 
     12: [255,255,0], #Shadow instead of clear: yellow
     13: [204,204,0], #Shadow instead of semitransparent: Dark yellow 1
     
-    14: [138,43,226], #Semitransparent instead of cloud: blue violet
-    15: [178,34,34], #Semitransparent instead of clear: firebrick
-    16: [34,139,34], #Semitransparent instead of shadow : forestgreen
+    14: [240,128,128], #Semitransparent instead of cloud: lightcolar
+    15: [255,0,0], #Semitransparent instead of clear: red
+    16: [220,20,60], #Semitransparent instead of shadow : crimson
     
-    17: [237, 14, 222], #Undefined area: instead of shadow : ugly purple
-    18: [203, 14, 237] #Undefined area: instead of shadow : ugly purple 2
+    17: [255,0,255], #True undefined : fuchsia
+    18: [238,130,238], #Undefined predicted instead of sth else: violet
+    19: [153,50,204] #Predicted something else instead of undefined: darkorchid
     }
     
 #Create the rgb-image
@@ -212,13 +184,13 @@ im_result = Image.fromarray(np.uint8(rgb_img))
 
 gs = GridSpec(6,1)
 
-fig = plt.figure(figsize = (10,10))
+fig = plt.figure(figsize = (10,12))
 ax1 = fig.add_subplot(gs[:-1,:]) ##for the plot
 ax2 = fig.add_subplot(gs[-1,:])   ##for the legend
 
 ax1.imshow(im_result)
 
-legend_labels=["True cloud","True clear","True cloudshadow","True semitransparent cloud","P: cloud T: clear","P: cloud T: shadow","P: cloud T: semitransparent cloud","P: clear T: cloud","P: clear T: shadow","P: clear T: semitransparent","P: shadow T: cloud","P: shadow T: clear","P: shadow T: semitransparent","P: semitransparent T: cloud","P: semitransparent T: clear","P: semitransparent T: shadow","T: undefined","P:undefined"]
+legend_labels=["True cloud","True clear","True cloudshadow","True semitransparent cloud","P: cloud T: clear","P: cloud T: shadow","P: cloud T: semitransparent cloud","P: clear T: cloud","P: clear T: shadow","P: clear T: semitransparent","P: shadow T: cloud","P: shadow T: clear","P: shadow T: semitransparent","P: semitransparent T: cloud","P: semitransparent T: clear","P: semitransparent T: shadow","True undefined","Undef. FP","Undef. FN"]
 
 legend_data=[]
 
@@ -233,16 +205,11 @@ handles = [Rectangle((0,0),1,1, color = tuple((v/255 for v in c))) for k,c,n in 
 labels = [n for k,c,n in legend_data]
 
 ax2.legend(handles,labels, mode='expand', ncol=3)
-
 ax2.axis('off')
 ax1.axis('off')
 
 plt.savefig(input_folder+"/prediction_info.png" ,bbox_inches = 'tight',pad_inches = 0)
 
-if(check(problem)==False):
-    plt.savefig("prediction_v1/problematic_tiles/"+input_folder.split("/")[-1]+"_prediction_info.png",bbox_inches = 'tight',pad_inches = 0)
-
-if(check(problem2)==False):
-    plt.savefig("prediction_v1/tiles_where_undefined_is_predicted/"+input_folder.split("/")[-1]+"_prediction_info.png",bbox_inches = 'tight',pad_inches = 0)
-    
+if(check(true_undefined)==False or check(predictedundefined_instead_)==False or check(predicted_instead_undefined)==False):
+    plt.savefig(tiles_with_undefined+"/"+input_folder.split("/")[-1]+"_prediction_info.png",bbox_inches = 'tight',pad_inches = 0)
          
