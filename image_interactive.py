@@ -4,14 +4,21 @@ import cv2 as cv
 import mpldatacursor
 import numpy as np
 import matplotlib.patches as patches
+<<<<<<< HEAD
 import tkinter as tk
 from tkinter import messagebox
+=======
+>>>>>>> 7d6e3316967f490a22a82f33a66b4380ea1d2aea
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--input", required=True, help="path to input image")
 parser.add_argument("--ratio", required=True, help="rescaling ratio (eg 0.2 - 20% of original resolution)")
+<<<<<<< HEAD
 parser.add_argument("--label", default=False, choices=["True", "False"], help="use this if you want to see information about label image or prediction image (5-color greyscale images)")
 parser.add_argument("--output", required=True, help="path to txt file where you want to save problematic tile numbers by right-clicking on the tile")
+=======
+parser.add_argument("--label", default=False, choices=["True", "False"], help="use this if you want to see information about label image or prediction image")
+>>>>>>> 7d6e3316967f490a22a82f33a66b4380ea1d2aea
 
 a = parser.parse_args()
 
@@ -30,7 +37,11 @@ ax.imshow(img)
 
 #Create a rectangle to show the border of individual tile
 
+<<<<<<< HEAD
 rect = patches.Rectangle((0,0),512*ratio,512*ratio,linewidth=1,edgecolor='r',facecolor='none')
+=======
+rect = patches.Rectangle((1000,1000),512*ratio,512*ratio,linewidth=1,edgecolor='r',facecolor='none')
+>>>>>>> 7d6e3316967f490a22a82f33a66b4380ea1d2aea
 ax.add_patch(rect)
 
 color_to_label = {
@@ -83,6 +94,7 @@ def on_mouse_move(event):
         rect.set_xy((x,y))
         fig.canvas.draw()
 
+<<<<<<< HEAD
 
 #Confirmation message when saving the tile
 
@@ -104,6 +116,8 @@ def onclick(event):
             button1 = tk.Button(command=confirm(label))
           
 fig.canvas.mpl_connect('button_press_event', onclick)
+=======
+>>>>>>> 7d6e3316967f490a22a82f33a66b4380ea1d2aea
 fig.canvas.mpl_connect('motion_notify_event', on_mouse_move)
 
 #Display the label and tile info as the cursor moves
