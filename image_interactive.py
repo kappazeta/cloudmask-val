@@ -6,6 +6,10 @@ import numpy as np
 import matplotlib.patches as patches
 import tkinter as tk
 from tkinter import messagebox
+import os.path 
+import matplotlib
+
+matplotlib.use('TkAgg')
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--input", required=True, help="path to input image")
@@ -14,6 +18,9 @@ parser.add_argument("--label", default=False, choices=["True", "False"], help="u
 parser.add_argument("--output", required=True, help="path to txt file where you want to save problematic tile numbers by right-clicking on the tile")
 
 a = parser.parse_args()
+
+image_name=os.path.basename(a.input)
+image_name=(image_name.split("_")[0]+"_"+image_name.split("_")[1])  #Input file name is expected to be in the format *_*_*, like T35VLF_20200529T120441_im_scl.png
 
 #Read in and resize the image
 
@@ -100,7 +107,7 @@ def onclick(event):
             j=int(event.ydata) #y-koord
             tile_x=int(i*(1/ratio)/512)
             tile_y=int(j*(1/ratio)/512)
-            label="tile_"+str(tile_x)+"_"+str(tile_y)
+            label=image_name+"_"+str(tile_x)+"_"+str(tile_y)
             button1 = tk.Button(command=confirm(label))
           
 fig.canvas.mpl_connect('button_press_event', onclick)
