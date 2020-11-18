@@ -8,8 +8,16 @@ from matplotlib.patches import Rectangle
 from matplotlib.gridspec import GridSpec
 from matplotlib import cm
 
-input_folder=sys.argv[1]
-tiles_with_undefined=sys.argv[2]
+
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--input", required=True, help="path to prediction folder of experiment")
+parser.add_argument("--undefined_output", help="use this if you want to save tiles with undefined values (either in label or prediction) to separate folder")
+
+a = parser.parse_args()
+
+input_folder=a.input
+tiles_with_undefined=a.undefined_output
 
 predict=input_folder+'/prediction.png'
 mask=input_folder+'/label.png'
@@ -39,26 +47,28 @@ true_undefined=((m==3) & (p==3))
 predictedcloud_instead_clear = ((p==255) & (m==66))
 predictedcloud_instead_cloudshadow=((p==255) & (m==129))
 predictedcloud_instead_semitransparent=((p==255) & (m==192))
-
+#predictedcloud_instead_undefined=((p==255) & (m==3))
 
 predictedclear_instead_cloud = ((p==66) & (m==255))
 predictedclear_instead_cloudshadow = ((p==66) & (m==129))
 predictedclear_instead_semitransparent = ((p==66) & (m==192))
-
+#predictedclear_instead_undefined = ((p==66) & (m==3))
 
 predictedshadow_instead_cloud = ((p==129) & (m==255))
 predictedshadow_instead_clear = ((p==129) & (m==66))
 predictedshadow_instead_semitransparent = ((p==129) & (m==192))
-
+#predictedshadow_instead_undefined = ((p==129) & (m==3))
 
 predictedsemitransparent_instead_cloud = ((p==192) & (m==255))
 predictedsemitransparent_instead_clear = ((p==192) & (m==66))
 predictedsemitransparent_instead_cloudshadow = ((p==192) & (m==129))
-
+#predictedsemitransparent_instead_undefined = ((p==192) & (m==3))
 
 predicted_instead_undefined=((p!=3) & (m==3))
 predictedundefined_instead_ = ((p==3) & (m!=3))
-
+#predictedundefined_instead_clear = ((p==3) & (m==66))
+#predictedundefined_instead_semitransparent = ((p==3) & (m==192))
+#predictedundefined_instead_cloudshadow = ((p==3) & (m==129))
 
 #We don't need to show all the labels every time; only these that are actually included
 #So create a list of existing labels
@@ -176,13 +186,23 @@ for key in label_to_color.keys():
     rgb_img[pix == key] = label_to_color[key]
 
 im_result = Image.fromarray(np.uint8(rgb_img))
+im_result.save(input_folder+"/prediction_info.png")
+
+if(tiles_with_undefined!=None):
+    if(check(true_undefined)==False or check(predictedundefined_instead_)==False or check(predicted_instead_undefined)==False):
+        im_result.save(tiles_with_undefined+"/"+input_folder.split("/")[-1]+"_prediction_info.png")
 
 
+'''
 #In order to include the legend, open this image in matplotlib
 
 gs = GridSpec(6,1)
 
-fig = plt.figure(figsize = (10,12))
+#fig = plt.figure(figsize = (10,12))
+
+fig = plt.figure(figsize = (6.7,7.3))
+
+
 ax1 = fig.add_subplot(gs[:-1,:]) ##for the plot
 ax2 = fig.add_subplot(gs[-1,:])   ##for the legend
 
@@ -210,4 +230,4 @@ plt.savefig(input_folder+"/prediction_info.png" ,bbox_inches = 'tight',pad_inche
 
 if(check(true_undefined)==False or check(predictedundefined_instead_)==False or check(predicted_instead_undefined)==False):
     plt.savefig(tiles_with_undefined+"/"+input_folder.split("/")[-1]+"_prediction_info.png",bbox_inches = 'tight',pad_inches = 0)
-         
+'''         

@@ -1,0 +1,8 @@
+***
+Experiment name: opt_mean_iou
+Experiment description: Experiment description here
+Data folder: /home/heido/cloudmask/opt_meaniou
+***
+Experiment name: dice_loss
+Experiment description: ...
+Data folder: /home/heido/cloudmask/dice_loss
