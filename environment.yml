@@ -1,0 +1,13 @@
+name: cm-val
+channels:
+  - conda-forge
+  - defaults
+  - bjornfjohansson
+dependencies:
+  - python>=3.5
+  - matplotlib
+  - mpldatacursor
+  - pillow
+  - numpy
+  - tk
+  - opencv
