@@ -27,7 +27,7 @@ image_name=(image_name.split("_")[0]+"_"+image_name.split("_")[1])  #Input file 
 img=cv.imread(a.input)
 height, width, channels = img.shape
 ratio=float(a.ratio)
-img=cv.resize(img,dsize=(int(height*ratio),int(width*ratio)))
+img=cv.resize(img,dsize=(int(width*ratio),int(height*ratio)))
 
 #Open the image interactively in matplotlib
 
