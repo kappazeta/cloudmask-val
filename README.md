@@ -44,3 +44,9 @@ It is most convenient to run these scripts correspondingly with the shell script
 There it is possible to see the particular tile number by hovering the cursor over interested area.
 The code also shows pixel information (replacing the color legend).
 The arguments needed to run `image_interactive.py` are described in the beginning of the code.
+
+`pixel_probability_info.py` requires as an argument path to one particular sub-tile folder, where the following files are located: predict_UNDEFINED.png, predict_CLEAR.png, predict_CLOUD_SHADOW.png, predict_SEMI_TRANSPARENT_CLOUD.png and predict_CLOUD.png, which map the model's confidence for each of the classes over given area, and prediction.png. The result will be an interactive matplotlib window, where, by hovering mouse over the pixels in prediction.png, the probability (in per centage) will be displayed for each class.
+
+`slider_comparison.py` will create an html page with two columns of slider images. In each slider image, the bottom layer is the original satellite image, and the top layer is the prediction mask: yellow shows where cloud is predicted, and respectively black for clear, blue for semitransparent, green for cloudshadow and purple for undefined. The opacity of the top layer is set to 0.2. In the left column the prediction from kappazeta's cloudmask is used, and in the right column the same prediction from some other model that we want to compare. The script rewuires two arguments: path to prediction folder (the folder which contains the sub-tile folders) and the name of the model that we want to compare sith (currently s2cor and s2cloudless are supported).
+
+
